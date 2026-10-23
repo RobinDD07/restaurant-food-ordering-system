@@ -1,0 +1,102 @@
+{% extends 'ordering/base.html' %}
+
+{% block title %}Food Menu{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-cup-hot text-danger me-2"></i>Food Menu</h2>
+        <p class="text-muted mb-0">Browse and manage food items, prices, ratings, and restaurant associations.</p>
+    </div>
+    <div class="mt-2 mt-md-0">
+        <a href="{% url 'food_create' %}" class="btn btn-danger shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Add Food Item
+        </a>
+    </div>
+</div>
+
+<!-- Search & Filter Card -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-3">
+        <form method="GET" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search food by name...">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select name="restaurant" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- All Restaurants --</option>
+                    {% for r in restaurants %}
+                        <option value="{{ r.restaurant_id }}" {% if selected_restaurant == r.restaurant_id %}selected{% endif %}>
+                            {{ r.restaurant_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-fill">Filter</button>
+                {% if search_query or selected_restaurant %}
+                    <a href="{% url 'food_list' %}" class="btn btn-outline-secondary">Reset</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Food Items Table -->
+<div class="card table-card bg-white">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th style="width: 80px;">Food ID (PK)</th>
+                    <th>Dish / Food Name</th>
+                    <th>Price</th>
+                    <th>Rating</th>
+                    <th>Restaurant (FK)</th>
+                    <th class="text-end" style="width: 140px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in foods %}
+                    <tr>
+                        <td class="fw-bold text-muted">#{{ f.food_id }}</td>
+                        <td class="fw-bold text-dark">
+                            <i class="bi bi-check2-circle text-success me-1"></i>
+                            {{ f.food_name }}
+                        </td>
+                        <td class="fw-bold text-success fs-6">₹{{ f.food_price }}</td>
+                        <td>
+                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+                                <i class="bi bi-star-fill text-warning me-1"></i>{{ f.food_rating }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'restaurant_list' %}?q={{ f.restaurant.restaurant_name }}" class="text-decoration-none fw-semibold text-danger">
+                                <i class="bi bi-shop me-1"></i>{{ f.restaurant.restaurant_name }}
+                            </a>
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'food_update' f.food_id %}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="{% url 'food_delete' f.food_id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-cup-hot display-6 d-block mb-2 text-muted"></i>
+                            No food items found matching your criteria. <a href="{% url 'food_create' %}">Add a food item</a>!
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

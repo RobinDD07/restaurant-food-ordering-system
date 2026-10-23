@@ -1,0 +1,72 @@
+{% extends 'ordering/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="d-flex align-items-center mb-3">
+            <a href="{% url 'customer_list' %}" class="btn btn-outline-secondary btn-sm me-3">
+                <i class="bi bi-arrow-left"></i> Back to Customers
+            </a>
+            <h3 class="fw-bold mb-0">{{ title }}</h3>
+        </div>
+
+        <div class="card form-card shadow-sm bg-white">
+            <div class="card-body p-4">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Customer Name -->
+                    <div class="mb-3">
+                        <label for="{{ form.cust_name.id_for_label }}" class="form-label">
+                            Full Name <span class="text-danger">*</span>
+                        </label>
+                        {{ form.cust_name }}
+                        {% if form.cust_name.errors %}
+                            <div class="text-danger small mt-1">{{ form.cust_name.errors|first }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="mb-3">
+                        <label for="{{ form.cust_ph_no.id_for_label }}" class="form-label">
+                            Phone Number <span class="text-danger">*</span>
+                        </label>
+                        {{ form.cust_ph_no }}
+                        {% if form.cust_ph_no.errors %}
+                            <div class="text-danger small mt-1">{{ form.cust_ph_no.errors|first }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Address -->
+                    <div class="mb-4">
+                        <label for="{{ form.cust_adrs.id_for_label }}" class="form-label">
+                            Delivery Address <span class="text-danger">*</span>
+                        </label>
+                        {{ form.cust_adrs }}
+                        {% if form.cust_adrs.errors %}
+                            <div class="text-danger small mt-1">{{ form.cust_adrs.errors|first }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'customer_list' %}" class="btn btn-light border px-4">Cancel</a>
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-save me-1"></i> Save Customer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

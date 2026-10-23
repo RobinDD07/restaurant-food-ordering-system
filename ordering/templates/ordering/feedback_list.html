@@ -1,0 +1,77 @@
+{% extends 'ordering/base.html' %}
+
+{% block title %}Customer Feedback{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-chat-heart text-danger me-2"></i>Customer Feedback</h2>
+        <p class="text-muted mb-0">Ratings, reviews, and messages submitted by customers (<code>FEEDBACK</code> table).</p>
+    </div>
+    <div class="mt-2 mt-md-0">
+        <a href="{% url 'feedback_create' %}" class="btn btn-danger shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Submit Feedback
+        </a>
+    </div>
+</div>
+
+<div class="card table-card bg-white">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th style="width: 120px;">Feedback ID (PK)</th>
+                    <th>Customer (FK)</th>
+                    <th>Rating</th>
+                    <th>Review Message</th>
+                    <th>Date</th>
+                    <th class="text-end" style="width: 140px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fb in feedbacks %}
+                    <tr>
+                        <td class="fw-bold text-muted">#{{ fb.feedback_id }}</td>
+                        <td class="fw-bold text-dark">
+                            <i class="bi bi-person-circle text-muted me-1"></i>{{ fb.customer.cust_name }}
+                        </td>
+                        <td>
+                            <span class="text-warning fw-semibold">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= fb.rating %}
+                                        <i class="bi bi-star-fill"></i>
+                                    {% else %}
+                                        <i class="bi bi-star text-muted"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="badge bg-warning-subtle text-warning-emphasis ms-1">{{ fb.rating }}/5</span>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="text-dark">"{{ fb.message }}"</span>
+                        </td>
+                        <td>
+                            <i class="bi bi-calendar3 text-muted me-1"></i>{{ fb.feedback_date|date:"d M Y" }}
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'feedback_update' fb.feedback_id %}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="{% url 'feedback_delete' fb.feedback_id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-chat-heart display-6 d-block mb-2 text-muted"></i>
+                            No feedback recorded yet. <a href="{% url 'feedback_create' %}">Submit the first review</a>!
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

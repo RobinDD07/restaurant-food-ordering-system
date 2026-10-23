@@ -1,0 +1,87 @@
+{% extends 'ordering/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7 col-md-9">
+        <div class="d-flex align-items-center mb-3">
+            <a href="{% url 'food_list' %}" class="btn btn-outline-secondary btn-sm me-3">
+                <i class="bi bi-arrow-left"></i> Back to Menu
+            </a>
+            <h3 class="fw-bold mb-0">{{ title }}</h3>
+        </div>
+
+        <div class="card form-card shadow-sm bg-white">
+            <div class="card-body p-4">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Food Name -->
+                    <div class="mb-3">
+                        <label for="{{ form.food_name.id_for_label }}" class="form-label">
+                            Food Name / Dish Title <span class="text-danger">*</span>
+                        </label>
+                        {{ form.food_name }}
+                        {% if form.food_name.errors %}
+                            <div class="text-danger small mt-1">{{ form.food_name.errors|first }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Price & Rating -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.food_price.id_for_label }}" class="form-label">
+                                Price (₹) <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                {{ form.food_price }}
+                            </div>
+                            {% if form.food_price.errors %}
+                                <div class="text-danger small mt-1">{{ form.food_price.errors|first }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.food_rating.id_for_label }}" class="form-label">
+                                Food Rating (0.0 to 5.0) <span class="text-danger">*</span>
+                            </label>
+                            {{ form.food_rating }}
+                            {% if form.food_rating.errors %}
+                                <div class="text-danger small mt-1">{{ form.food_rating.errors|first }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Restaurant (Foreign Key) -->
+                    <div class="mb-4">
+                        <label for="{{ form.restaurant.id_for_label }}" class="form-label">
+                            Restaurant Offering This Food (Foreign Key) <span class="text-danger">*</span>
+                        </label>
+                        {{ form.restaurant }}
+                        <div class="form-text">Associates this food item with the restaurant offering it in its menu.</div>
+                        {% if form.restaurant.errors %}
+                            <div class="text-danger small mt-1">{{ form.restaurant.errors|first }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'food_list' %}" class="btn btn-light border px-4">Cancel</a>
+                        <button type="submit" class="btn btn-danger px-4">
+                            <i class="bi bi-save me-1"></i> Save Food Item
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

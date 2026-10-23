@@ -1,0 +1,281 @@
+{% extends 'ordering/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9 col-md-11">
+        <div class="d-flex align-items-center mb-3">
+            <a href="{% url 'order_list' %}" class="btn btn-outline-secondary btn-sm me-3">
+                <i class="bi bi-arrow-left"></i> Back to Orders
+            </a>
+            <h3 class="fw-bold mb-0">{{ title }}</h3>
+        </div>
+
+        <form method="POST" id="orderForm" novalidate>
+            {% csrf_token %}
+
+            <div class="row g-4">
+                <!-- Left: ORDER_DETAILS Form (Core Schema) -->
+                <div class="col-lg-6">
+                    <div class="card form-card shadow-sm bg-white h-100">
+                        <div class="card-header bg-light py-3 border-bottom">
+                            <h5 class="fw-bold mb-0 text-dark">
+                                <i class="bi bi-receipt me-2 text-danger"></i>1. Order Details (Required Table)
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in form.non_field_errors %}
+                                        <p class="mb-0">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <!-- Customer (FK) -->
+                            <div class="mb-3">
+                                <label for="{{ form.customer.id_for_label }}" class="form-label">
+                                    Customer (Foreign Key) <span class="text-danger">*</span>
+                                </label>
+                                {{ form.customer }}
+                                {% if form.customer.errors %}
+                                    <div class="text-danger small mt-1">{{ form.customer.errors|first }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Supplier (FK) -->
+                            <div class="mb-3">
+                                <label for="{{ form.supplier.id_for_label }}" class="form-label">
+                                    Supplier (Foreign Key) <span class="text-danger">*</span>
+                                </label>
+                                {{ form.supplier }}
+                                {% if form.supplier.errors %}
+                                    <div class="text-danger small mt-1">{{ form.supplier.errors|first }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Order Date -->
+                            <div class="mb-3">
+                                <label for="{{ form.order_date.id_for_label }}" class="form-label">
+                                    Order Date <span class="text-danger">*</span>
+                                </label>
+                                {{ form.order_date }}
+                                {% if form.order_date.errors %}
+                                    <div class="text-danger small mt-1">{{ form.order_date.errors|first }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Quantity & Price -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.quantity.id_for_label }}" class="form-label">
+                                        Total Quantity <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.quantity }}
+                                    {% if form.quantity.errors %}
+                                        <div class="text-danger small mt-1">{{ form.quantity.errors|first }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.price.id_for_label }}" class="form-label">
+                                        Total Price (₹) <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.price }}
+                                    {% if form.price.errors %}
+                                        <div class="text-danger small mt-1">{{ form.price.errors|first }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info py-2 small mb-0">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Selecting food items on the right will automatically calculate the total quantity and price. You can also enter them directly.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Optional ORDER_ITEMS Selection -->
+                <div class="col-lg-6">
+                    <div class="card form-card shadow-sm bg-white h-100">
+                        <div class="card-header bg-light py-3 border-bottom d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold mb-0 text-dark">
+                                <i class="bi bi-basket me-2 text-warning"></i>2. Food Items (<code>ORDER_ITEMS</code>)
+                            </h5>
+                            <span class="badge bg-warning-subtle text-warning-emphasis">Schema Extension</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <p class="text-muted small">
+                                Select specific dishes to link with this order. Each item will be stored in the relational <code>ORDER_ITEMS</code> table.
+                            </p>
+
+                            <!-- Add Item Selector -->
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Select Food Item to Add:</label>
+                                <div class="input-group">
+                                    <select id="foodItemSelect" class="form-select">
+                                        <option value="">-- Choose Food Item --</option>
+                                        {% for f in available_foods %}
+                                            <option value="{{ f.food_id }}" data-name="{{ f.food_name }}" data-price="{{ f.food_price }}" data-rest="{{ f.restaurant.restaurant_name }}">
+                                                {{ f.food_name }} — ₹{{ f.food_price }} ({{ f.restaurant.restaurant_name }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="button" class="btn btn-outline-danger" id="addItemBtn">
+                                        <i class="bi bi-plus-lg"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Selected Items Container -->
+                            <div class="table-responsive border rounded mb-3" style="max-height: 250px; overflow-y: auto;">
+                                <table class="table table-sm align-middle mb-0" id="orderItemsTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Dish</th>
+                                            <th style="width: 70px;">Qty</th>
+                                            <th>Price</th>
+                                            <th>Subtotal</th>
+                                            <th style="width: 40px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="itemsTableBody">
+                                        <tr id="emptyRow">
+                                            <td colspan="5" class="text-center text-muted py-3 small">
+                                                No specific food items added yet.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                                <span class="fw-semibold">Calculated Total:</span>
+                                <span class="fw-bold fs-5 text-success" id="calculatedTotal">₹0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Actions -->
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a href="{% url 'order_list' %}" class="btn btn-light border px-4">Cancel</a>
+                <button type="submit" class="btn btn-danger px-5 py-2 fw-semibold shadow-sm">
+                    <i class="bi bi-bag-check-fill me-1"></i> Confirm &amp; Place Order
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const foodSelect = document.getElementById('foodItemSelect');
+    const addItemBtn = document.getElementById('addItemBtn');
+    const tableBody = document.getElementById('itemsTableBody');
+    const emptyRow = document.getElementById('emptyRow');
+    const calculatedTotalElem = document.getElementById('calculatedTotal');
+    const qtyInput = document.getElementById('{{ form.quantity.id_for_label }}');
+    const priceInput = document.getElementById('{{ form.price.id_for_label }}');
+
+    let selectedItems = [];
+
+    addItemBtn.addEventListener('click', function () {
+        const option = foodSelect.options[foodSelect.selectedIndex];
+        if (!option.value) return;
+
+        const foodId = option.value;
+        const foodName = option.getAttribute('data-name');
+        const price = parseFloat(option.getAttribute('data-price'));
+
+        const existing = selectedItems.find(item => item.id === foodId);
+        if (existing) {
+            existing.quantity += 1;
+        } else {
+            selectedItems.push({
+                id: foodId,
+                name: foodName,
+                price: price,
+                quantity: 1
+            });
+        }
+
+        renderItems();
+    });
+
+    function renderItems() {
+        if (selectedItems.length === 0) {
+            tableBody.innerHTML = `
+                <tr id="emptyRow">
+                    <td colspan="5" class="text-center text-muted py-3 small">
+                        No specific food items added yet.
+                    </td>
+                </tr>`;
+            calculatedTotalElem.textContent = '₹0.00';
+            return;
+        }
+
+        let html = '';
+        let totalQty = 0;
+        let totalPrice = 0;
+
+        selectedItems.forEach((item, index) => {
+            const subtotal = item.price * item.quantity;
+            totalQty += item.quantity;
+            totalPrice += subtotal;
+
+            html += `
+                <tr>
+                    <td class="small fw-semibold">
+                        ${item.name}
+                        <input type="hidden" name="item_food_id[]" value="${item.id}">
+                        <input type="hidden" name="item_price[]" value="${item.price.toFixed(2)}">
+                    </td>
+                    <td>
+                        <input type="number" name="item_quantity[]" value="${item.quantity}" min="1" class="form-control form-control-sm text-center item-qty-input" data-index="${index}" style="width: 60px;">
+                    </td>
+                    <td class="small text-muted">₹${item.price.toFixed(2)}</td>
+                    <td class="small fw-bold text-success">₹${subtotal.toFixed(2)}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-link text-danger p-0 remove-item-btn" data-index="${index}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tableBody.innerHTML = html;
+        calculatedTotalElem.textContent = `₹${totalPrice.toFixed(2)}`;
+
+        // Automatically populate main ORDER_DETAILS form fields
+        qtyInput.value = totalQty;
+        priceInput.value = totalPrice.toFixed(2);
+
+        // Bind remove and qty change events
+        document.querySelectorAll('.remove-item-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const idx = parseInt(this.getAttribute('data-index'));
+                selectedItems.splice(idx, 1);
+                renderItems();
+            });
+        });
+
+        document.querySelectorAll('.item-qty-input').forEach(input => {
+            input.addEventListener('change', function () {
+                const idx = parseInt(this.getAttribute('data-index'));
+                const newQty = parseInt(this.value);
+                if (newQty > 0) {
+                    selectedItems[idx].quantity = newQty;
+                    renderItems();
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

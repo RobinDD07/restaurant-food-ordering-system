@@ -1,0 +1,85 @@
+{% extends 'ordering/base.html' %}
+
+{% block title %}DBMS Queries Live Demonstration{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-9">
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-terminal text-warning me-2"></i>DBMS SQL Concepts Demonstration
+        </h2>
+        <p class="text-muted mb-0">
+            Live query results executed on MySQL database <code>restaurant_food_ordering</code> for college evaluation &amp; viva.
+        </p>
+    </div>
+    <div class="col-md-3 text-md-end mt-2 mt-md-0">
+        <a href="{% url 'dbms_queries_demo' %}" class="btn btn-outline-warning shadow-sm">
+            <i class="bi bi-arrow-clockwise me-1"></i> Re-run Queries
+        </a>
+    </div>
+</div>
+
+<!-- Overview Card -->
+<div class="alert alert-dark bg-dark text-white border-0 shadow-sm p-3 mb-4">
+    <div class="d-flex align-items-center">
+        <i class="bi bi-info-circle-fill text-warning fs-4 me-3"></i>
+        <div>
+            <span class="fw-bold">Course Demonstration Feature:</span>
+            This page executes raw SQL queries directly through Django's database connection to MySQL, demonstrating core relational database concepts: <code>SELECT</code>, <code>WHERE</code>, <code>INNER JOIN</code>, <code>LEFT JOIN</code>, <code>GROUP BY</code>, <code>HAVING</code>, and aggregate functions (<code>COUNT</code>, <code>SUM</code>, <code>AVG</code>).
+        </div>
+    </div>
+</div>
+
+<!-- Queries List -->
+{% for result in results %}
+    <div class="card shadow-sm border-0 bg-white mb-4">
+        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0 text-dark">
+                {{ result.title }}
+            </h5>
+            <span class="badge bg-primary">{{ result.count }} row{{ result.count|pluralize }} returned</span>
+        </div>
+        <div class="card-body p-4">
+            <p class="text-muted mb-2"><strong>Concept &amp; Description:</strong> {{ result.description }}</p>
+            
+            <!-- SQL Box -->
+            <div class="sql-code-box mb-3">
+                <pre class="mb-0"><code>{{ result.sql }}</code></pre>
+            </div>
+
+            {% if result.error %}
+                <div class="alert alert-danger py-2 small mb-0">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Error: {{ result.error }}
+                </div>
+            {% else %}
+                <div class="table-responsive border rounded">
+                    <table class="table table-sm table-striped table-hover mb-0">
+                        <thead class="table-secondary">
+                            <tr>
+                                {% for col in result.columns %}
+                                    <th class="small">{{ col }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in result.rows %}
+                                <tr>
+                                    {% for val in row %}
+                                        <td class="small">{{ val }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="{{ result.columns|length }}" class="text-center text-muted py-2 small">
+                                        Query returned 0 rows. (Ensure sample data has been loaded).
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'ordering/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="d-flex align-items-center mb-3">
+            <a href="{% url 'agent_list' %}" class="btn btn-outline-secondary btn-sm me-3">
+                <i class="bi bi-arrow-left"></i> Back to Agents
+            </a>
+            <h3 class="fw-bold mb-0">{{ title }}</h3>
+        </div>
+
+        <div class="card form-card shadow-sm bg-white">
+            <div class="card-body p-4">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Agent Name -->
+                    <div class="mb-3">
+                        <label for="{{ form.agent_name.id_for_label }}" class="form-label">
+                            Agent Name <span class="text-danger">*</span>
+                        </label>
+                        {{ form.agent_name }}
+                        {% if form.agent_name.errors %}
+                            <div class="text-danger small mt-1">{{ form.agent_name.errors|first }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="mb-3">
+                        <label for="{{ form.agent_ph_number.id_for_label }}" class="form-label">
+                            Phone Number <span class="text-danger">*</span>
+                        </label>
+                        {{ form.agent_ph_number }}
+                        {% if form.agent_ph_number.errors %}
+                            <div class="text-danger small mt-1">{{ form.agent_ph_number.errors|first }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Supplier (Foreign Key) -->
+                    <div class="mb-4">
+                        <label for="{{ form.supplier.id_for_label }}" class="form-label">
+                            Supplier (Foreign Key) <span class="text-danger">*</span>
+                        </label>
+                        {{ form.supplier }}
+                        <div class="form-text">Associates this delivery agent with the hiring supplier vendor.</div>
+                        {% if form.supplier.errors %}
+                            <div class="text-danger small mt-1">{{ form.supplier.errors|first }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'agent_list' %}" class="btn btn-light border px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-save me-1"></i> Save Agent
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

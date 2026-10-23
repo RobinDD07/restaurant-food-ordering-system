@@ -1,0 +1,261 @@
+{% extends 'ordering/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold mb-1"><i class="bi bi-speedometer2 text-danger me-2"></i>System Dashboard</h2>
+        <p class="text-muted mb-0">Overview of the Restaurant Food Ordering Database System (MySQL + Django)</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="{% url 'order_create' %}" class="btn btn-danger me-2 shadow-sm">
+            <i class="bi bi-cart-plus me-1"></i> Create Order
+        </a>
+        <a href="{% url 'dbms_queries_demo' %}" class="btn btn-outline-dark shadow-sm">
+            <i class="bi bi-terminal-split me-1"></i> SQL Demo
+        </a>
+    </div>
+</div>
+
+<!-- 7 Entity Counts Cards (Matching the 7 required tables) -->
+<div class="row g-3 mb-4">
+    <!-- Restaurants -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card bg-white p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted text-uppercase fw-semibold" style="font-size: 0.8rem;">1. RESTAURANTS</span>
+                    <h2 class="fw-bold my-1">{{ counts.restaurants }}</h2>
+                    <a href="{% url 'restaurant_list' %}" class="text-decoration-none small text-danger fw-semibold">
+                        View all <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="stat-icon bg-danger-subtle text-danger">
+                    <i class="bi bi-shop"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Food Items -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card bg-white p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted text-uppercase fw-semibold" style="font-size: 0.8rem;">2. FOOD ITEMS</span>
+                    <h2 class="fw-bold my-1">{{ counts.food }}</h2>
+                    <a href="{% url 'food_list' %}" class="text-decoration-none small text-warning fw-semibold">
+                        View menu <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="stat-icon bg-warning-subtle text-warning">
+                    <i class="bi bi-cup-hot"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Suppliers -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card bg-white p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted text-uppercase fw-semibold" style="font-size: 0.8rem;">3. SUPPLIERS</span>
+                    <h2 class="fw-bold my-1">{{ counts.suppliers }}</h2>
+                    <a href="{% url 'supplier_list' %}" class="text-decoration-none small text-info fw-semibold">
+                        View suppliers <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="stat-icon bg-info-subtle text-info">
+                    <i class="bi bi-truck"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agents -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card bg-white p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted text-uppercase fw-semibold" style="font-size: 0.8rem;">4. AGENTS</span>
+                    <h2 class="fw-bold my-1">{{ counts.agents }}</h2>
+                    <a href="{% url 'agent_list' %}" class="text-decoration-none small text-primary fw-semibold">
+                        View agents <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="stat-icon bg-primary-subtle text-primary">
+                    <i class="bi bi-person-badge"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customers -->
+    <div class="col-xl-4 col-md-6">
+        <div class="card stat-card bg-white p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted text-uppercase fw-semibold" style="font-size: 0.8rem;">5. CUSTOMERS</span>
+                    <h2 class="fw-bold my-1">{{ counts.customers }}</h2>
+                    <a href="{% url 'customer_list' %}" class="text-decoration-none small text-success fw-semibold">
+                        View customers <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="stat-icon bg-success-subtle text-success">
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders -->
+    <div class="col-xl-4 col-md-6">
+        <div class="card stat-card bg-white p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted text-uppercase fw-semibold" style="font-size: 0.8rem;">6. ORDER DETAILS</span>
+                    <h2 class="fw-bold my-1">{{ counts.orders }}</h2>
+                    <a href="{% url 'order_list' %}" class="text-decoration-none small text-secondary fw-semibold">
+                        View orders <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="stat-icon bg-secondary-subtle text-secondary">
+                    <i class="bi bi-bag-check"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback -->
+    <div class="col-xl-4 col-md-12">
+        <div class="card stat-card bg-white p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted text-uppercase fw-semibold" style="font-size: 0.8rem;">7. FEEDBACK ENTRIES</span>
+                    <h2 class="fw-bold my-1">{{ counts.feedback }}</h2>
+                    <a href="{% url 'feedback_list' %}" class="text-decoration-none small text-danger fw-semibold">
+                        View reviews <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="stat-icon bg-danger-subtle text-danger">
+                    <i class="bi bi-chat-heart"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DBMS Aggregates Summary Row -->
+<div class="card shadow-sm border-0 mb-4 bg-dark text-white rounded-3">
+    <div class="card-body p-4">
+        <div class="row text-center g-3">
+            <div class="col-md-3 col-6 border-end border-secondary">
+                <span class="text-white-50 small text-uppercase">Total Sales (SUM)</span>
+                <h3 class="fw-bold text-success my-1">₹{{ aggregates.total_revenue|floatformat:2 }}</h3>
+            </div>
+            <div class="col-md-3 col-6 border-end border-secondary">
+                <span class="text-white-50 small text-uppercase">Items Ordered (SUM)</span>
+                <h3 class="fw-bold text-warning my-1">{{ aggregates.total_items_sold }}</h3>
+            </div>
+            <div class="col-md-3 col-6 border-end border-secondary">
+                <span class="text-white-50 small text-uppercase">Avg Order Value (AVG)</span>
+                <h3 class="fw-bold text-info my-1">₹{{ aggregates.avg_order_value|floatformat:2 }}</h3>
+            </div>
+            <div class="col-md-3 col-6">
+                <span class="text-white-50 small text-uppercase">Avg Restaurant Rating (AVG)</span>
+                <h3 class="fw-bold text-warning my-1">{{ aggregates.avg_restaurant_rating|floatformat:1 }} <i class="bi bi-star-fill text-warning fs-5"></i></h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Orders & Recent Feedbacks -->
+<div class="row g-4">
+    <!-- Recent Orders -->
+    <div class="col-lg-7">
+        <div class="card table-card bg-white">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+                <h5 class="fw-bold mb-0"><i class="bi bi-clock-history text-danger me-2"></i>Recent Orders</h5>
+                <a href="{% url 'order_list' %}" class="btn btn-sm btn-outline-danger">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Supplier</th>
+                            <th>Date</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders %}
+                            <tr>
+                                <td class="fw-bold">#{{ order.order_id }}</td>
+                                <td>{{ order.customer.cust_name }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ order.supplier.supplier_name }}</span></td>
+                                <td>{{ order.order_date|date:"d M Y" }}</td>
+                                <td>{{ order.quantity }}</td>
+                                <td class="fw-semibold text-success">₹{{ order.price }}</td>
+                                <td>
+                                    <a href="{% url 'order_detail' order.order_id %}" class="btn btn-sm btn-light border" title="Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">
+                                    <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                    No orders placed yet. <a href="{% url 'order_create' %}">Create one now</a>!
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Feedback & Reviews -->
+    <div class="col-lg-5">
+        <div class="card table-card bg-white">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+                <h5 class="fw-bold mb-0"><i class="bi bi-star-half text-warning me-2"></i>Customer Feedback</h5>
+                <a href="{% url 'feedback_list' %}" class="btn btn-sm btn-outline-warning">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for fb in recent_feedbacks %}
+                        <li class="list-group-item p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold">{{ fb.customer.cust_name }}</span>
+                                <span class="text-warning">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= fb.rating %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-star text-muted"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                            </div>
+                            <p class="text-muted small mb-1">"{{ fb.message }}"</p>
+                            <small class="text-secondary" style="font-size: 0.75rem;"><i class="bi bi-calendar3 me-1"></i>{{ fb.feedback_date }}</small>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-center py-4 text-muted">
+                            No feedback entries yet. <a href="{% url 'feedback_create' %}">Submit feedback</a>!
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
